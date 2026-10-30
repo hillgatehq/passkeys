@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Passkey P-256 Signing</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <h1>Passkey P-256 Signing</h1>
+    <p class="intro">
+      Create a passkey (ES256 / P-256), then use it to sign a payload. The
+      signature is verified right here in the browser with WebCrypto.
+      Nothing leaves your device.
+    </p>
+
+    <p id="support" class="notice" hidden></p>
+
+    <section>
+      <h2>1. Create a passkey</h2>
+      <label for="username">Username</label>
+      <input id="username" type="text" value="demo-user" autocomplete="username webauthn" autocapitalize="off" spellcheck="false">
+      <button id="register" type="button">Create passkey</button>
+      <div id="register-out" class="out"></div>
+
+      <h3>Passkeys known to this page</h3>
+      <ul id="cred-list"></ul>
+      <button id="clear" type="button" class="secondary">Forget all</button>
+      <p class="hint">
+        Only the public keys are stored (in this browser's localStorage).
+        Forgetting them here does not delete the passkey from your device.
+      </p>
+    </section>
+
+    <section>
+      <h2>2. Sign a payload</h2>
+      <label for="payload">Payload</label>
+      <textarea id="payload" rows="4">{"action":"transfer","amount":42,"to":"alice"}</textarea>
+      <button id="sign" type="button">Sign with passkey</button>
+      <div id="sign-out" class="out"></div>
+    </section>
+
+    <section>
+      <h2>How it works</h2>
+      <ol class="how">
+        <li>The page computes <code>challenge = SHA-256(payload)</code>.</li>
+        <li>The authenticator signs <code>authenticatorData || SHA-256(clientDataJSON)</code> with ECDSA P-256, where <code>clientDataJSON</code> contains the challenge.</li>
+        <li>A verifier checks the challenge matches the payload hash, then checks the signature against the public key saved at registration.</li>
+      </ol>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
